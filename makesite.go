@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type PageContent struct {
@@ -23,14 +26,17 @@ type PageData struct {
 func main() {
 	fmt.Println("Starting...")
 	
-	filePath := "first-post.txt"
+	filePath := flag.String("file", "", "file to be parsed")
+	flag.Parse()
+	if *filePath == "" {
+		panic(errors.New("file needed"))
+	}
 
 	// read file
-	fileContents, err := ioutil.ReadFile(filePath)
+	fileContents, err := ioutil.ReadFile(*filePath)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(fileContents))
 
 	// parse data into template
 	t, err := template.ParseFiles("template.tmpl")
@@ -38,8 +44,15 @@ func main() {
 		panic(err)
 	}
 
+	// get file's name
+	periodIndex := strings.Index(*filePath, ".")
+	fileNameSlice := []rune(*filePath)
+	newFileName := string(fileNameSlice[:periodIndex]) + ".html"
+
+	fmt.Println(string(newFileName))
+
 	// create new html file
-	newFile, err := os.Create("new.html")
+	newFile, err := os.Create(newFileName)
 	if err != nil {
 		panic(err)
 	}

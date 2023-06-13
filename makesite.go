@@ -105,7 +105,6 @@ func generateNewFileName(input string) string {
 
 func main() {
 	fmt.Println("Starting...")
-	
 	filePath := flag.String("file", "", "file to be parsed")
 	dirPath := flag.String("dir", "", "directory of files to be parsed")
 

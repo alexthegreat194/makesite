@@ -56,7 +56,6 @@ func formatContent(text string) PageContent {
 	}
 
 	data := PageContent{finalList[0], finalList[1:]}
-	fmt.Println(data)
 	return data
 }
 
@@ -89,24 +88,55 @@ func generateSite(data PageContent, dest string, templateName string) {
 	}
 }
 
+func generateNewFileName(input string) string {
+	// get file's name
+	periodIndex := strings.Index(input, ".")
+	fileNameSlice := []rune(input)
+	newFileName := string(fileNameSlice[:periodIndex]) + ".html"
+
+	if strings.Contains(newFileName, "/") {
+		slashIndex := strings.Index(newFileName, "/")
+		fileNameSlice = []rune(newFileName)
+		newFileName = string(fileNameSlice[slashIndex+1:])
+	}
+
+	return newFileName
+}
+
 func main() {
 	fmt.Println("Starting...")
 	
 	filePath := flag.String("file", "", "file to be parsed")
+	dirPath := flag.String("dir", "", "directory of files to be parsed")
+
 	flag.Parse()
-	if *filePath == "" {
+
+	if *filePath == "" && *dirPath == ""{
 		panic(errors.New("file needed"))
 	}
 
+	filesToBeParsed := []string{}
+	if *filePath != "" {
+		filesToBeParsed = append(filesToBeParsed, *filePath)
+	}
+	if *dirPath != "" {
+		files, err := ioutil.ReadDir(*dirPath)
+		if err != nil {
+			panic(err)
+		}
 
-	fileContents := readFile(*filePath)
-	content := formatContent(fileContents)
-	
+		for _, file := range files {
+			if strings.Contains(file.Name(), ".txt") {
+				filesToBeParsed = append(filesToBeParsed, *dirPath + "/" + file.Name())
+			}
+		}
+	}
 
-	// get file's name
-	periodIndex := strings.Index(*filePath, ".")
-	fileNameSlice := []rune(*filePath)
-	newFileName := string(fileNameSlice[:periodIndex]) + ".html"
-
-	generateSite(content, newFileName, "template.tmpl")
+	for _, v := range filesToBeParsed {
+		fileContents := readFile(v)
+		content := formatContent(fileContents)
+		fileName := generateNewFileName(v)
+		generateSite(content, "output/" + fileName, "template.tmpl")
+		fmt.Println(fileName) // logs that the file is done
+	}
 }

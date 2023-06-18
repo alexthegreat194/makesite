@@ -8,6 +8,9 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/schollz/progressbar/v3"
 )
 
 type PageContent struct {
@@ -95,7 +98,7 @@ func generateNewFileName(input string) string {
 	newFileName := string(fileNameSlice[:periodIndex]) + ".html"
 
 	if strings.Contains(newFileName, "/") {
-		slashIndex := strings.Index(newFileName, "/")
+		slashIndex := strings.LastIndex(newFileName, "/")
 		fileNameSlice = []rune(newFileName)
 		newFileName = string(fileNameSlice[slashIndex+1:])
 	}
@@ -104,7 +107,6 @@ func generateNewFileName(input string) string {
 }
 
 func main() {
-	fmt.Println("Starting...")
 	filePath := flag.String("file", "", "file to be parsed")
 	dirPath := flag.String("dir", "", "directory of files to be parsed")
 
@@ -131,11 +133,18 @@ func main() {
 		}
 	}
 
+	bar := progressbar.Default(int64(len(filesToBeParsed)))
+
 	for _, v := range filesToBeParsed {
 		fileContents := readFile(v)
 		content := formatContent(fileContents)
 		fileName := generateNewFileName(v)
 		generateSite(content, "output/" + fileName, "template.tmpl")
-		fmt.Println(fileName) // logs that the file is done
+
+		bar.Describe(fileName)
+		bar.Add(1)
 	}
+
+	green := color.New(color.Bold, color.FgGreen).PrintlnFunc()
+	green("Finished!")
 }

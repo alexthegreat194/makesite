@@ -92,7 +92,7 @@ If you get stuck on any step, be sure to print the output to `stdout`!
     - [ ] Translating page content using Google Translate.
     - [ ] Parse Markdown (`.md`) files and transform them into HTML. `#` through `######` should translate to `<h1>` through `<h6>` elements.
     - [x] **_FILL IN THE BLANK_**: `I will use the Color and Progressbar library. The documentation is located at both of the github links. My goal is to use it to imporve the user experience.`
-- [ ] **Add, commit, and push to GitHub**.
+- [x] **Add, commit, and push to GitHub**.
 
 ## Resources
 
